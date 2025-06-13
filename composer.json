@@ -1,25 +1,32 @@
 {
-    "type": "project",
+    "name": "guycollegmbh/contao-custom-slider-bundle",
+    "type": "contao-bundle",
+    "description": "Custom Slider extension for Contao Open Source CMS",
+    "license": "LGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "GUYCOLLEGMBH",
+            "homepage": ""
+        }
+    ],
     "require": {
-        "contao/conflicts": "*@dev",
-        "contao/manager-bundle": "4.13.*",
-        "contao/calendar-bundle": "4.13.*",
-        "contao/comments-bundle": "4.13.*",
-        "contao/faq-bundle": "4.13.*",
-        "contao/listing-bundle": "4.13.*",
-        "contao/news-bundle": "4.13.*",
-        "contao/newsletter-bundle": "4.13.*"
+        "contao/core-bundle": "4.13.*"
     },
     "extra": {
-        "public-dir": "public",
-        "contao-component-dir": "assets"
+        "contao-manager-plugin": "GUYCOLLEGMBH\\ContaoCustomSliderBundle\\ContaoManager\\Plugin"
     },
-    "scripts": {
-        "post-install-cmd": [
-            "@php vendor/bin/contao-setup"
-        ],
-        "post-update-cmd": [
-            "@php vendor/bin/contao-setup"
-        ]
+    "autoload": {
+        "psr-4": {
+            "GUYCOLLEGMBH\\ContaoCustomSliderBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GUYCOLLEGMBH\\ContaoCustomSliderBundle\\Tests\\": "tests/"
+        }
+    },
+    "support": {
+        "issues": "https://bitbucket.org/guycolle-clients/contao-custom-slider-bundle.git/issues",
+        "source": "https://bitbucket.org/guycolle-clients/contao-custom-slider-bundle.git"
     }
 }
