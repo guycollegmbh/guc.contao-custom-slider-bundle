@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class ContaoCustomSliderBundle extends Extension
+class ContaoCustomSliderExtension extends Extension
 {
     /**
      * {@inheritdoc}
