@@ -1,0 +1,269 @@
+<?php
+ 
+ 
+/**
+ * Table tl_kategorien
+ */
+$GLOBALS['TL_DCA']['tl_customslider'] = array
+(
+ 
+	// Config
+	'config'   => array
+	(
+		'dataContainer'    => 'Table',
+		'enableVersioning' => true,
+		'sql'              => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary'
+			)
+		),
+	),
+	// List
+	'list'     => array
+	(
+		'sorting'           => array
+			(
+				'mode'        => 2,
+				'fields'      => array('Bezeichnung'),
+				'flag'        => 1,
+				'panelLayout' => 'filter;sort,search,limit'
+			),	
+		'label'             => array
+			(
+				'fields' => array('Bezeichnung','active'),
+				'format' => '%s (Slide Aktiv: %s)',
+			),	
+		'global_operations' => array
+		(
+			'all' => array
+			(
+				'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
+				'href'       => 'act=select',
+				'class'      => 'header_edit_all',
+				'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+			)
+		),	
+		'operations'        => array
+		(
+			'edit'   => array
+			(
+				'label' => &$GLOBALS['TL_LANG']['tl_customslider']['edit'],
+				'href'  => 'act=edit',
+				'icon'  => 'edit.gif'
+			),
+			'delete' => array
+			(
+				'label'      => &$GLOBALS['TL_LANG']['tl_customslider']['delete'],
+				'href'       => 'act=delete',
+				'icon'       => 'delete.gif',
+				'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+			),
+			'show'   => array
+			(
+				'label'      => &$GLOBALS['TL_LANG']['tl_customslider']['show'],
+				'href'       => 'act=show',
+				'icon'       => 'show.gif',
+				'attributes' => 'style="margin-right:3px"'
+			),
+		)
+	),
+			
+	// Palettes
+	'palettes' => array
+	(
+		'default'       => 'Bezeichnung,alias,sliderBild,sliderTitel,sliderUntertitel,sliderText,sliderColor,sliderLinkURL,target,sliderLinkText,sliderPlazierung,sliderReihenfolge,active'
+	),
+	// Fields
+	'fields'   => array
+	(
+		'id'     => array
+		(
+			'sql' => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'pid'     => array
+		(
+			'sql' => "int(10) unsigned NOT NULL"
+		),
+		'sorting'     => array
+		(
+			'sql' => "int(10) unsigned NOT NULL"
+		),
+		'tstamp' => array
+		(
+			'sql' => "int(10) unsigned NOT NULL default '0'"
+		),
+		'Bezeichnung'  => array
+		(
+			'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['Bezeichnung'],
+			'inputType' => 'text',
+			'exclude'   => true,
+			'sorting'   => true,
+			'flag'      => 1,
+			'search'    => true,
+			'eval'      => array(
+			'mandatory'   => true,
+			'unique'         => true,
+			'maxlength'   => 255,
+			),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'alias' => array
+		(
+			'label'                   	=> &$GLOBALS['TL_LANG']['tl_customslider']['alias'],
+			'exclude'                 	=> true,
+			'search'                  	=> true,
+			'inputType'               	=> 'text',
+			'eval'                    	=> array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>128),
+			'save_callback' => array
+			(
+				array('tl_customslider', 'generateAlias')
+			),
+			'sql'                     => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
+		),
+		'sliderBild' => array
+		(
+			'label'         		=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderBild'], 
+			'exclude'       		=> true,
+			'inputType'     		=> 'fileTree',
+			'eval'          		=> array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>Config::get('validImageTypes')),
+			'sql'           		=> "binary(16) NULL"
+		),
+		'sliderTitel'  => array
+		(
+			'label'     			=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderTitel'],
+			'inputType' 			=> 'text',
+			'exclude'   			=> true,
+			'sorting'   			=> true,
+			'flag'      			=> 1,
+			'search'    			=> true,
+			'sql'       			=> "varchar(255) NOT NULL default ''"
+		),
+		'sliderUntertitel'  => array
+		(
+			'label'     			=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderUntertitel'],
+			'inputType' 			=> 'text',
+			'exclude'   			=> true,
+			'sorting'   			=> true,
+			'flag'      			=> 1,
+			'search'    			=> true,
+			'sql'       			=> "varchar(255) NOT NULL default ''"
+		),
+		'sliderText'  => array
+		(
+			'label'     			=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderText'],
+			'inputType' 			=> 'text',
+			'exclude'   			=> true,
+			'sorting'   			=> true,
+			'flag'      			=> 1,
+			'search'    			=> true,
+			'sql'       			=> "varchar(255) NOT NULL default ''"
+		),
+		'sliderColor'  => array
+		(
+			'label'     			=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderColor'],
+			'inputType' 			=> 'text',
+			'exclude'   			=> true,
+			'sorting'   			=> true,
+			'flag'      			=> 1,
+			'search'    			=> true,
+			'sql'       			=> "varchar(6) NOT NULL default ''"
+		),
+		'sliderLinkURL'  => array
+		(
+			'label'     				=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderLinkURL'],
+			'exclude'                 	=> true,
+			'inputType'               	=> 'pageTree',
+			'eval'                    	=> array('fieldType'=>'radio', 'tl_class'=>'clr'),
+			'sql'       				=> "varchar(255) NOT NULL default ''"
+		),
+		'target'  => array
+		(
+			'label'     				=> &$GLOBALS['TL_LANG']['tl_customslider']['target'],
+			'exclude'                 	=> true,
+			'inputType'               	=> 'checkbox',
+			'sql'                     	=> "char(1) NOT NULL default ''"
+		),
+		'sliderLinkText'  => array
+		(
+			'label'     			=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderLinkText'],
+			'inputType' 			=> 'text',
+			'exclude'   			=> true,
+			'sorting'   			=> true,
+			'flag'      			=> 1,
+			'search'    			=> true,
+			'sql'       			=> "varchar(255) NOT NULL default ''"
+		),
+		'sliderPlazierung'  => array
+		(
+			'label'     				=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderPlazierung'],
+			'exclude'                 	=> true,
+			'inputType'               	=> 'pageTree',
+			'eval'                    	=> array('fieldType'=>'checkbox', 'tl_class'=>'clr', 'multiple'=>true),
+			'sql'                     	=> "blob NULL"
+		)
+		,
+		'sliderReihenfolge'  => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_customslider']['sliderReihenfolge'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>10, 'rgxp'=>'digit'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
+		'active'  => array
+		(
+			'label'     				=> &$GLOBALS['TL_LANG']['tl_customslider']['active'],
+			'default'                 	=> 1,
+			'exclude'                 	=> true,
+			'inputType'               	=> 'checkbox',
+			'eval'                    	=> array('tl_class'=>'w50'),
+			'sql'                     	=> "char(1) NOT NULL default ''"
+		)
+	)
+);		
+
+
+//Automatisches Erzuegen Alias "alias" aus Feld "kategorie"
+class tl_customslider extends Backend
+{
+
+	/**
+	 * Auto-generate the event alias if it has not been set yet
+	 *
+	 * @param mixed         $varValue
+	 * @param DataContainer $dc
+	 *
+	 * @return mixed
+	 *
+	 * @throws Exception
+	 */
+	public function generateAlias($varValue, DataContainer $dc)
+	{
+		$autoAlias = false;
+
+		// Generate alias if there is none
+		if ($varValue == '')
+		{
+			$autoAlias = true;
+			$varValue = StringUtil::generateAlias($dc->activeRecord->Bezeichnung);
+		}
+
+		$objAlias = $this->Database->prepare("SELECT id FROM tl_customslider WHERE alias=? AND id!=?")
+								   ->execute($varValue, $dc->id);
+
+		// Check whether the event alias exists
+		if ($objAlias->numRows)
+		{
+			if (!$autoAlias)
+			{
+				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+			}
+
+			$varValue .= '-' . $dc->id;
+		}
+
+		return $varValue;
+	}
+}	
