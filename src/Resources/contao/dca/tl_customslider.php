@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
 			(
 				array('tl_customslider', 'generateAlias')
 			),
-			'sql'                     => "varchar(128) COLLATE utf8 NOT NULL default ''"
+			'sql' => ['type' => 'string', 'length' => 255, 'default' => '']
 		),
 		'sliderBild' => array
 		(
