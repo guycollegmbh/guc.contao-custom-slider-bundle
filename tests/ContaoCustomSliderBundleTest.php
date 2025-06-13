@@ -3,7 +3,7 @@
 /*
  * This file is part of Contao Custom Slider Bundle.
  *
- * (c) John Doe
+ * (c) GUYCOLLE GMBH
  *
  * @license LGPL-3.0-or-later
  */
