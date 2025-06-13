@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
 		),
 		'sorting'     => array
 		(
-			'sql' => "int(10) unsigned NOT NULL"
+			'sql' => "int(10) unsigned NOT NULL default '0'"
 		),
 		'tstamp' => array
 		(
