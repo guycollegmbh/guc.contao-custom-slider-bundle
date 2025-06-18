@@ -5,8 +5,9 @@
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\PageModel;
+use Contao\System;
 
-$currentPageID = $this->replaceInsertTags('{{page::id}}'); 
+$currentPageID = $GLOBALS['objPage']->id ?? null;
 ?>
 
 <div class="large-24 medium-24 columns index_banner">
@@ -43,14 +44,17 @@ $currentPageID = $this->replaceInsertTags('{{page::id}}');
                             
                             <?php if ($slider['sliderLinkURL']): ?>
                                 <?php 
-                                $linkUrl = $this->replaceInsertTags("{{link_url::{$slider['sliderLinkURL']}}}");
+                                $pageModel = PageModel::findByPk($slider['sliderLinkURL']);
+                                $linkUrl = $pageModel ? $pageModel->getFrontendUrl() : '';
                                 $linkText = $slider['sliderLinkText'] ?: 'Mehr erfahren';
                                 ?>
+                                <?php if ($linkUrl): ?>
                                 <a href="<?= StringUtil::specialchars($linkUrl) ?>" 
                                    class="button radius round"
                                    <?php if ($slider['target']): ?>target="_blank" rel="noopener noreferrer"<?php endif; ?>>
                                     <?= StringUtil::specialchars($linkText) ?>
                                 </a>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </div>
