@@ -1,5 +1,10 @@
 <?php
- 
+
+use Contao\Backend;
+use Contao\Config;
+use Contao\DataContainer;
+use Contao\Database;
+use Contao\StringUtil;
  
 /**
  * Table tl_kategorien
