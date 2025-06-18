@@ -2,7 +2,11 @@
 
 namespace GUYCOLLEGMBH\ContaoCustomSliderBundle\Module;
 
-class CustomSliderModule extends \Module
+use Contao\Module;
+use Contao\BackendTemplate;
+use Contao\Database;
+
+class CustomSliderModule extends Module
 {
     /**
      * @var string
@@ -17,7 +21,7 @@ class CustomSliderModule extends \Module
     public function generate()
     {
         if (TL_MODE == 'BE') {
-            $template = new \BackendTemplate('be_wildcard');
+            $template = new BackendTemplate('be_wildcard');
 
             $template->wildcard = '### '.utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['customSlider'][0]).' ###';
             $template->title = $this->headline;
@@ -37,7 +41,7 @@ class CustomSliderModule extends \Module
     protected function compile()
     {
         //$this->Template->message = 'Hello World';
-        $objData = $this->Database->prepare("SELECT * FROM tl_customslider ORDER BY sliderReihenfolge")->execute();
+        $objData = Database::getInstance()->prepare("SELECT * FROM tl_customslider ORDER BY sliderReihenfolge")->execute();
         $this->Template->slider = $objData->fetchAllAssoc();
     }
 }
