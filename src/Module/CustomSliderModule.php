@@ -5,6 +5,9 @@ namespace GUYCOLLEGMBH\ContaoCustomSliderBundle\Module;
 use Contao\Module;
 use Contao\BackendTemplate;
 use Contao\Database;
+use Contao\System;
+use Contao\CoreBundle\Routing\ScopeMatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CustomSliderModule extends Module
 {
@@ -20,7 +23,9 @@ class CustomSliderModule extends Module
      */
     public function generate()
     {
-        if (TL_MODE == 'BE') {
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+        
+        if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
             $template = new BackendTemplate('be_wildcard');
 
             $template->wildcard = '### '.utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['customSlider'][0]).' ###';
@@ -40,7 +45,6 @@ class CustomSliderModule extends Module
      */
     protected function compile()
     {
-        //$this->Template->message = 'Hello World';
         $objData = Database::getInstance()->prepare("SELECT * FROM tl_customslider ORDER BY sliderReihenfolge")->execute();
         $this->Template->slider = $objData->fetchAllAssoc();
     }
