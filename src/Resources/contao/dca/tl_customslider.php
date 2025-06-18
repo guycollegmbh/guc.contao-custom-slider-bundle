@@ -127,7 +127,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
 			'label'         		=> &$GLOBALS['TL_LANG']['tl_customslider']['sliderBild'], 
 			'exclude'       		=> true,
 			'inputType'     		=> 'fileTree',
-			'eval'          		=> array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>Config::get('validImageTypes')),
+			'eval'          		=> array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>\Contao\Config::get('validImageTypes')),
 			'sql'           		=> "binary(16) NULL"
 		),
 		'sliderTitel'  => array
