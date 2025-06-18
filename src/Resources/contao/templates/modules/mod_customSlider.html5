@@ -1,36 +1,63 @@
 <?php $this->extend('block_searchable_slider'); ?>
 <?php $this->block('content'); ?>
 
-<?php $currentPageID = $this->replaceInsertTags( '{{page::id}}' ); ?>
+<?php 
+use Contao\FilesModel;
+use Contao\StringUtil;
+use Contao\PageModel;
 
-    <div class="large-24 medium-24 columns index_banner">
-        <ul class="example-orbit" data-orbit data-options="animation:slide;pause_on_hover:false;animation_speed:500;timer_speed: 5000;navigation_arrows:true;bullets:true;">
-            <?php foreach ($this->slider as $slider): ?>
-            <?php $sliderPlazierung = deserialize($slider['sliderPlazierung']); ?>
-                <?php if ($slider['active'] == 1 AND (in_array($currentPageID, $sliderPlazierung))): ?>
-                    <li>
-                        <img src="<?php echo \FilesModel::findByUuid($slider['sliderBild'])->path; ?>" />
-                        <div class="orbit-caption">
-                            <div class="banner_text">
-                                <?php if ($slider['sliderTitel']): ?>
-                                    <h2 <?php if ($slider['sliderColor']): ?>style="color:#<?php echo $slider['sliderColor']; ?>"<?php endif;?>><?php echo $slider['sliderTitel']; ?></h2>
-                                <?php endif;?>
-                                <?php if ($slider['sliderUntertitel']): ?>
-                                    <p class="year_block"><?php echo $slider['sliderUntertitel']; ?></p>
-                                <?php endif;?>
-                                <?php if ($slider['sliderText']): ?>
-                                    <p <?php if ($slider['sliderColor']): ?>style="color:#<?php echo $slider['sliderColor']; ?>"<?php endif;?>><?php echo $slider['sliderText']; ?></p>
-                                <?php endif;?>
-                                <?php if ($slider['sliderLinkURL']): ?>
-                                    <a href="{{link_url::<?php echo $slider['sliderLinkURL']; ?>}}" class="button [radius round]" <?php if ($slider['target']): ?>target="_blank"<?php endif;?>><?php echo $slider['sliderLinkText']; ?></a>
-                                <?php endif;?>
-                            </div>
+$currentPageID = $this->replaceInsertTags('{{page::id}}'); 
+?>
+
+<div class="large-24 medium-24 columns index_banner">
+    <ul class="example-orbit" data-orbit data-options="animation:slide;pause_on_hover:false;animation_speed:500;timer_speed: 5000;navigation_arrows:true;bullets:true;">
+        <?php foreach ($this->slider as $slider): ?>
+        <?php $sliderPlazierung = StringUtil::deserialize($slider['sliderPlazierung']); ?>
+            <?php if ($slider['active'] == 1 && (is_array($sliderPlazierung) && in_array($currentPageID, $sliderPlazierung))): ?>
+                <li>
+                    <?php 
+                    $fileModel = FilesModel::findByUuid($slider['sliderBild']);
+                    $imagePath = $fileModel ? $fileModel->path : '';
+                    ?>
+                    <?php if ($imagePath): ?>
+                        <img src="<?= $imagePath ?>" alt="<?= StringUtil::specialchars($slider['sliderTitel'] ?: 'Slider Image') ?>">
+                    <?php endif; ?>
+                    
+                    <div class="orbit-caption">
+                        <div class="banner_text">
+                            <?php if ($slider['sliderTitel']): ?>
+                                <h2<?php if ($slider['sliderColor']): ?> style="color:#<?= StringUtil::specialchars($slider['sliderColor']) ?>"<?php endif; ?>>
+                                    <?= StringUtil::specialchars($slider['sliderTitel']) ?>
+                                </h2>
+                            <?php endif; ?>
+                            
+                            <?php if ($slider['sliderUntertitel']): ?>
+                                <p class="year_block"><?= StringUtil::specialchars($slider['sliderUntertitel']) ?></p>
+                            <?php endif; ?>
+                            
+                            <?php if ($slider['sliderText']): ?>
+                                <p<?php if ($slider['sliderColor']): ?> style="color:#<?= StringUtil::specialchars($slider['sliderColor']) ?>"<?php endif; ?>>
+                                    <?= nl2br(StringUtil::specialchars($slider['sliderText'])) ?>
+                                </p>
+                            <?php endif; ?>
+                            
+                            <?php if ($slider['sliderLinkURL']): ?>
+                                <?php 
+                                $linkUrl = $this->replaceInsertTags("{{link_url::{$slider['sliderLinkURL']}}}");
+                                $linkText = $slider['sliderLinkText'] ?: 'Mehr erfahren';
+                                ?>
+                                <a href="<?= StringUtil::specialchars($linkUrl) ?>" 
+                                   class="button radius round"
+                                   <?php if ($slider['target']): ?>target="_blank" rel="noopener noreferrer"<?php endif; ?>>
+                                    <?= StringUtil::specialchars($linkText) ?>
+                                </a>
+                            <?php endif; ?>
                         </div>
-                    </li>
-                <?php endif;?>
-            <?php endforeach; ?>  
-        </ul>
-    </div>
+                    </div>
+                </li>
+            <?php endif; ?>
+        <?php endforeach; ?>  
+    </ul>
+</div>
 
-<?= $this->message; ?>
 <?php $this->endblock(); ?>
