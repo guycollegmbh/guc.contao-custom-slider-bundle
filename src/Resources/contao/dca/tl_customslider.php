@@ -5,6 +5,7 @@ use Contao\Config;
 use Contao\DataContainer;
 use Contao\Database;
 use Contao\StringUtil;
+use Contao\DC_Table;
  
 /**
  * Table tl_kategorien
@@ -15,7 +16,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
 	// Config
 	'config'   => array
 	(
-		'dataContainer'    => 'Table',
+		'dataContainer'    => DC_Table::class,
 		'enableVersioning' => true,
 		'sql'              => array
 		(
