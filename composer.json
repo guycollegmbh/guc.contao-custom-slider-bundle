@@ -26,7 +26,7 @@
         }
     },
     "support": {
-        "issues": "https://bitbucket.org/guycolle-clients/contao-custom-slider-bundle.git/issues",
-        "source": "https://bitbucket.org/guycolle-clients/contao-custom-slider-bundle.git"
+        "issues": "https://github.com/guycollegmbh/guc.contao-custom-slider-bundle/issues",
+        "source": "https://github.com/guycollegmbh/guc.contao-custom-slider-bundle"
     }
 }
