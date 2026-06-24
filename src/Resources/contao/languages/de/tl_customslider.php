@@ -43,6 +43,9 @@ $GLOBALS['TL_LANG']['tl_customslider']['target'][1] = 'Neues Fenster öffnen';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderLinkText'][0] = 'Linktext';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderLinkText'][1] = 'Geben Sie hier den Linktext ein';
 
+$GLOBALS['TL_LANG']['tl_customslider']['sliderLinkTitle'][0] = 'Link Title-Tag';
+$GLOBALS['TL_LANG']['tl_customslider']['sliderLinkTitle'][1] = 'Title-Attribut für den Link (erscheint als Tooltip beim Hovern über den Button)';
+
 $GLOBALS['TL_LANG']['tl_customslider']['sliderPlazierung'][0] = 'Plazierung';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderPlazierung'][1] = 'Auswählen auf welchen Seiten der Slide angezeigt werden soll';
 

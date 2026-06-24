@@ -2,33 +2,22 @@
 
 namespace GUYCOLLEGMBH\ContaoCustomSliderBundle\Module;
 
-use Contao\Module;
 use Contao\BackendTemplate;
-use Contao\Database;
+use Contao\Module;
 use Contao\System;
-use Contao\CoreBundle\Routing\ScopeMatcher;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class CustomSliderModule extends Module
 {
-    /**
-     * @var string
-     */
     protected $strTemplate = 'mod_customSlider';
 
-    /**
-     * Displays a wildcard in the back end.
-     *
-     * @return string
-     */
     public function generate()
     {
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
-        
+
         if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
             $template = new BackendTemplate('be_wildcard');
 
-            $template->wildcard = '### '.utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['customSlider'][0]).' ###';
+            $template->wildcard = '### '.mb_strtoupper($GLOBALS['TL_LANG']['FMD']['customSlider'][0]).' ###';
             $template->title = $this->headline;
             $template->id = $this->id;
             $template->link = $this->name;
@@ -40,12 +29,10 @@ class CustomSliderModule extends Module
         return parent::generate();
     }
 
-    /**
-     * Generates the module.
-     */
     protected function compile()
     {
-        $objData = Database::getInstance()->prepare("SELECT * FROM tl_customslider ORDER BY sliderReihenfolge")->execute();
-        $this->Template->slider = $objData->fetchAllAssoc();
+        $connection = System::getContainer()->get('database_connection');
+        $result = $connection->executeQuery('SELECT * FROM tl_customslider ORDER BY sliderReihenfolge');
+        $this->Template->slider = $result->fetchAllAssociative();
     }
 }

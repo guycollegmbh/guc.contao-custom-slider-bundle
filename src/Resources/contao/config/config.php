@@ -1,9 +1,8 @@
 <?php
 
-// Backend end modules
+// Backend modules
 $GLOBALS['BE_MOD']['slider']['customslider'] = array(
-	'tables' => array('tl_customslider'),
-	'icon'   => 'system/modules/screencast/assets/images/screencast.png'
+    'tables' => array('tl_customslider'),
 );
 
 // Frontend modules

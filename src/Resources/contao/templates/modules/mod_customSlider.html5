@@ -49,8 +49,9 @@ $currentPageID = $GLOBALS['objPage']->id ?? null;
                                 $linkText = $slider['sliderLinkText'] ?: 'Mehr erfahren';
                                 ?>
                                 <?php if ($linkUrl): ?>
-                                <a href="<?= StringUtil::specialchars($linkUrl) ?>" 
+                                <a href="<?= StringUtil::specialchars($linkUrl) ?>"
                                    class="button radius round"
+                                   <?php if ($slider['sliderLinkTitle']): ?>title="<?= StringUtil::specialchars($slider['sliderLinkTitle']) ?>"<?php endif; ?>
                                    <?php if ($slider['target']): ?>target="_blank" rel="noopener noreferrer"<?php endif; ?>>
                                     <?= StringUtil::specialchars($linkText) ?>
                                 </a>
