@@ -4,6 +4,27 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.0] – 2026-06-25
+
+### Erweiterung: Vimeo Video-Support
+- Neues Feld `mediaType` (Auswahl: `image` / `video`) — bestimmt ob ein Slide ein Bild oder ein Video anzeigt.
+  - Default: `image` → bestehende Slides funktionieren ohne Änderung weiter.
+  - Subpaletten: Im Backend erscheint je nach Auswahl entweder das Bild-Feld oder das Vimeo-ID-Feld.
+- Neues Feld `sliderVimeoId` (varchar 20) — numerische Vimeo Video-ID (z.B. `123456789`).
+- Vimeo Player via **CDN** (`https://player.vimeo.com/api/player.js`) — kein Build-System nötig.
+- Video-Verhalten:
+  - Autoplay beim Anzeigen des Slides
+  - Loop (Endloswiederholung)
+  - Keine Steuerelemente — nur eigener **Mute/Unmute-Button** (Overlay, unten rechts)
+  - Video standardmässig **stumm geschaltet** (Browser-Autoplay-Policy konform)
+  - Klick auf Video → **Pause / Play** Toggle
+  - Slide-Wechsel in Foundation Orbit → Video wird automatisch **pausiert**
+- Das Vimeo Player JS wird nur geladen wenn auf der Seite mindestens ein Video-Slide aktiv ist.
+- Text-Overlays (Titel, Untertitel, Text, Link-Button) funktionieren auch beim Video-Slide.
+- **Nach dem Update `contao:migrate` ausführen** (2 neue DB-Felder).
+
+---
+
 ## [1.1.0] – 2026-06-24
 
 ### Erweiterung
@@ -89,6 +110,8 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 | `target`            | char(1)      | Neues Fenster öffnen                            | 1.0.0   |
 | `sliderLinkText`    | varchar(255) | Button-Text                                     | 1.0.0   |
 | `sliderLinkTitle`   | varchar(255) | Title-Attribut für den Link (Tooltip)           | **1.1.0** |
+| `mediaType`         | varchar(10)  | Medientyp: `image` oder `video` (default: image) | **1.2.0** |
+| `sliderVimeoId`     | varchar(20)  | Numerische Vimeo Video-ID                       | **1.2.0** |
 | `sliderPlazierung`  | blob         | Seiten-Platzierung (serialisiertes Array)       | 1.0.0   |
 | `sliderReihenfolge` | int(10)      | Anzeigereihenfolge                              | 1.0.0   |
 | `active`            | char(1)      | Slide aktiv/inaktiv                             | 1.0.0   |

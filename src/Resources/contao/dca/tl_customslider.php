@@ -13,6 +13,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
     (
         'dataContainer'    => DC_Table::class,
         'enableVersioning' => true,
+        '__selector__'     => ['mediaType'],
         'sql'              => array
         (
             'keys' => array
@@ -75,7 +76,14 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => 'Bezeichnung,alias,sliderBild,sliderTitel,sliderUntertitel,sliderText,sliderColor,sliderLinkURL,target,sliderLinkText,sliderLinkTitle,sliderPlazierung,sliderReihenfolge,active'
+        'default' => 'Bezeichnung,alias,mediaType,sliderTitel,sliderUntertitel,sliderText,sliderColor,sliderLinkURL,target,sliderLinkText,sliderLinkTitle,sliderPlazierung,sliderReihenfolge,active'
+    ),
+
+    // Subpalettes
+    'subpalettes' => array
+    (
+        'mediaType_image' => 'sliderBild',
+        'mediaType_video' => 'sliderVimeoId',
     ),
 
     // Fields
@@ -121,6 +129,16 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             ),
             'sql'           => ['type' => 'string', 'length' => 255, 'default' => '']
         ),
+        'mediaType' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['mediaType'],
+            'exclude'   => true,
+            'inputType' => 'select',
+            'options'   => ['image', 'video'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_customslider']['mediaTypeOptions'],
+            'eval'      => array('submitOnChange' => true, 'tl_class' => 'w50'),
+            'sql'       => "varchar(10) NOT NULL default 'image'"
+        ),
         'sliderBild' => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['sliderBild'],
@@ -128,6 +146,15 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'inputType' => 'fileTree',
             'eval'      => array('fieldType' => 'radio', 'filesOnly' => true, 'extensions' => \Contao\Config::get('validImageTypes')),
             'sql'       => "binary(16) NULL"
+        ),
+        'sliderVimeoId' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['sliderVimeoId'],
+            'inputType' => 'text',
+            'exclude'   => true,
+            'search'    => true,
+            'eval'      => array('maxlength' => 20, 'rgxp' => 'digit', 'tl_class' => 'w50'),
+            'sql'       => "varchar(20) NOT NULL default ''"
         ),
         'sliderTitel' => array
         (

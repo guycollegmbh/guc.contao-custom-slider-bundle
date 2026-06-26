@@ -19,8 +19,17 @@ $GLOBALS['TL_LANG']['tl_customslider']['Bezeichnung'][1] = 'Geben Sie hier den T
 $GLOBALS['TL_LANG']['tl_customslider']['alias'][0] = 'Alias';
 $GLOBALS['TL_LANG']['tl_customslider']['alias'][1] = 'Wird vom System automatisch generiert';
 
+$GLOBALS['TL_LANG']['tl_customslider']['mediaType'][0] = 'Medientyp';
+$GLOBALS['TL_LANG']['tl_customslider']['mediaType'][1] = 'Wählen Sie ob dieser Slide ein Bild oder ein Vimeo-Video verwendet';
+
+$GLOBALS['TL_LANG']['tl_customslider']['mediaTypeOptions']['image'] = 'Bild';
+$GLOBALS['TL_LANG']['tl_customslider']['mediaTypeOptions']['video'] = 'Vimeo Video';
+
 $GLOBALS['TL_LANG']['tl_customslider']['sliderBild'][0] = 'Bild';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderBild'][1] = 'Bild auswählen';
+
+$GLOBALS['TL_LANG']['tl_customslider']['sliderVimeoId'][0] = 'Vimeo Video-ID';
+$GLOBALS['TL_LANG']['tl_customslider']['sliderVimeoId'][1] = 'Nur die numerische ID des Vimeo-Videos eingeben (z.B. 123456789)';
 
 $GLOBALS['TL_LANG']['tl_customslider']['sliderTitel'][0] = 'Titel';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderTitel'][1] = 'Geben Sie hier den Titel ein';
