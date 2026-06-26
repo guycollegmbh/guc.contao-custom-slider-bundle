@@ -113,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'sorting'   => true,
             'flag'      => 1,
             'search'    => true,
-            'eval'      => array('mandatory' => true, 'unique' => true, 'maxlength' => 255),
+            'eval'      => array('mandatory' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'alias' => array
@@ -122,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'exclude'       => true,
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => array('rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 128),
+            'eval'          => array('rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 128, 'tl_class' => 'w50'),
             'save_callback' => array
             (
                 array('tl_customslider', 'generateAlias')
@@ -164,6 +164,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'sorting'   => true,
             'flag'      => 1,
             'search'    => true,
+            'eval'      => array('tl_class' => 'w50 clr'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'sliderUntertitel' => array
@@ -174,6 +175,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'sorting'   => true,
             'flag'      => 1,
             'search'    => true,
+            'eval'      => array('tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'sliderText' => array
