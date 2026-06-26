@@ -17,7 +17,8 @@ class CustomSliderModule extends Module
         if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
             $template = new BackendTemplate('be_wildcard');
 
-            $template->wildcard = '### '.mb_strtoupper($GLOBALS['TL_LANG']['FMD']['customSlider'][0]).' ###';
+            $label = $GLOBALS['TL_LANG']['FMD']['customSlider'][0] ?? 'Slider';
+            $template->wildcard = '### '.mb_strtoupper($label, 'UTF-8').' ###';
             $template->title = $this->headline;
             $template->id = $this->id;
             $template->link = $this->name;
@@ -32,7 +33,9 @@ class CustomSliderModule extends Module
     protected function compile()
     {
         $connection = System::getContainer()->get('database_connection');
-        $result = $connection->executeQuery('SELECT * FROM tl_customslider ORDER BY sliderReihenfolge');
+        $result = $connection->executeQuery(
+            "SELECT * FROM tl_customslider WHERE active='1' ORDER BY sliderReihenfolge"
+        );
         $this->Template->slider = $result->fetchAllAssociative();
     }
 }

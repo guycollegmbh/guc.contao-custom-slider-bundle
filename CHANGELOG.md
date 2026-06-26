@@ -4,6 +4,41 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.1] – 2026-06-25 — Security & Bugfix Release
+
+### Security-Fixes
+- **XSS: `$imagePath` unescaped** — `FilesModel->path` wird jetzt mit `StringUtil::specialchars()` ausgegeben (war die einzige ungeschützte Ausgabe im Template).
+- **`sliderColor` Hex-Validierung** — Neuer `save_callback` `validateColor()` prüft ob der Wert dem Format `/^[0-9a-fA-F]{6}$/` entspricht. Verhindert CSS-Injection durch ungültige Werte im style-Attribut.
+- **SRI für Vimeo CDN** — Nicht umsetzbar: Vimeo liefert `player.js` ohne versionierte URL aus. Ein fixierter SRI-Hash würde bei jedem Vimeo-Update alle Video-Slides brechen. Risiko-Akzeptanz: Der CDN-Load bleibt ohne `integrity`-Attribut; im Kommentar im Template dokumentiert.
+
+### Bugfixes
+- **Orbit pausiert aktiven Video-Slide** — `changed.zf.orbit`-Handler pausiert jetzt nur inaktive Slides. Der neu angezeigte Slide wird via `li.is-active` erkannt und aus der Pause-Schleife ausgenommen.
+- **Player-ID-Kollision** — iframe-IDs enthalten jetzt die Modul-ID (`$this->id`): `vimeo-{moduleId}-{index}`. Mehrere Slider-Module auf derselben Seite interferieren nicht mehr.
+- **Mehrere Orbits auf einer Seite** — `document.querySelector` durch `querySelectorAll` ersetzt. Alle Orbit-Instanzen werden korrekt gebunden.
+- **`<style>` und `<script>` Duplizierung** — PHP `static $vimeoAssetsAdded` stellt sicher dass CSS und Vimeo SDK nur einmal in den HTML-Output geschrieben werden, auch bei mehreren Modul-Instanzen.
+- **`in_array` ohne strict mode** — Dritter Parameter `true` hinzugefügt. Verhindert loose-comparison Seiteneffekte (`null == 0`).
+
+### Verbesserungen
+- **`mb_strtoupper` mit explizitem `'UTF-8'`-Argument** — Verhindert korrumpierte Umlaute wenn `mb_internal_encoding()` serverseitig abweicht.
+- **Null-Guard auf `TL_LANG`-Key** — `$GLOBALS['TL_LANG']['FMD']['customSlider'][0] ?? 'Slider'` verhindert `TypeError` bei nicht geladenem Sprachfile.
+- **`SELECT * WHERE active='1'`** — Nur aktive Slides werden aus der DB geladen. Inaktive Slides werden nicht mehr als Template-Variable übergeben.
+- **`sliderLinkURL` SQL-Typ** — Von `varchar(255)` auf `int(10) unsigned NOT NULL default '0'` geändert. Passt zum `pageTree`-Widget (speichert Integer-Page-IDs). **Erfordert `contao:migrate`.**
+- **`active` SQL-Default** — Von `''` auf `'1'` korrigiert. PHP-Default und SQL-Default sind jetzt konsistent.
+
+### Rückwärtskompatibilität
+Alle bestehenden Slides bleiben vollständig erhalten. Die Schema-Änderungen (`sliderLinkURL` Typ, `active` Default) werden sicher durch `contao:migrate` migriert:
+- `varchar(255)` → `int(10)`: MySQL konvertiert gespeicherte Integer-Strings verlustfrei
+- `active` Default: betrifft nur neue Zeilen, bestehende Daten unverändert
+
+### Update-Schritte
+```bash
+composer update guycollegmbh/contao-custom-slider-bundle
+php vendor/bin/contao-console contao:migrate
+php vendor/bin/contao-console cache:clear
+```
+
+---
+
 ## [1.2.0] – 2026-06-25
 
 ### Erweiterung: Vimeo Video-Support
@@ -106,7 +141,7 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 | `sliderUntertitel`  | varchar(255) | Untertitel                                      | 1.0.0   |
 | `sliderText`        | varchar(255) | Fliesstext                                      | 1.0.0   |
 | `sliderColor`       | varchar(6)   | Textfarbe (HEX ohne #)                          | 1.0.0   |
-| `sliderLinkURL`     | varchar(255) | Verlinkung (Contao Page-ID)                     | 1.0.0   |
+| `sliderLinkURL`     | int(10)      | Verlinkung (Contao Page-ID) *(varchar→int 1.2.1)* | 1.0.0   |
 | `target`            | char(1)      | Neues Fenster öffnen                            | 1.0.0   |
 | `sliderLinkText`    | varchar(255) | Button-Text                                     | 1.0.0   |
 | `sliderLinkTitle`   | varchar(255) | Title-Attribut für den Link (Tooltip)           | **1.1.0** |

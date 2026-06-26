@@ -188,13 +188,16 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
         ),
         'sliderColor' => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['sliderColor'],
-            'inputType' => 'text',
-            'exclude'   => true,
-            'sorting'   => true,
-            'flag'      => 1,
-            'search'    => true,
-            'sql'       => "varchar(6) NOT NULL default ''"
+            'label'          => &$GLOBALS['TL_LANG']['tl_customslider']['sliderColor'],
+            'inputType'      => 'text',
+            'exclude'        => true,
+            'search'         => true,
+            'eval'           => array('maxlength' => 6, 'tl_class' => 'w50'),
+            'save_callback'  => array
+            (
+                array('tl_customslider', 'validateColor')
+            ),
+            'sql'            => "varchar(6) NOT NULL default ''"
         ),
         'sliderLinkURL' => array
         (
@@ -202,7 +205,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'exclude'   => true,
             'inputType' => 'pageTree',
             'eval'      => array('fieldType' => 'radio', 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "int(10) unsigned NOT NULL default '0'"
         ),
         'target' => array
         (
@@ -249,11 +252,11 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
         'active' => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['active'],
-            'default'   => 1,
+            'default'   => '1',
             'exclude'   => true,
             'inputType' => 'checkbox',
             'eval'      => array('tl_class' => 'w50'),
-            'sql'       => "char(1) NOT NULL default ''"
+            'sql'       => "char(1) NOT NULL default '1'"
         )
     )
 );
@@ -282,6 +285,15 @@ class tl_customslider extends Backend
             }
 
             $varValue .= '-' . $dc->id;
+        }
+
+        return $varValue;
+    }
+
+    public function validateColor($varValue, DataContainer $dc)
+    {
+        if ($varValue !== '' && !preg_match('/^[0-9a-fA-F]{6}$/', $varValue)) {
+            throw new \Exception($GLOBALS['TL_LANG']['tl_customslider']['colorInvalid'] ?? 'Bitte einen gültigen HEX-Farbwert eingeben (6 Zeichen ohne #, z.B. ff0000)');
         }
 
         return $varValue;

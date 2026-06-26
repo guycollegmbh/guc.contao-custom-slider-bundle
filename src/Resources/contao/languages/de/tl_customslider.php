@@ -41,7 +41,9 @@ $GLOBALS['TL_LANG']['tl_customslider']['sliderText'][0] = 'Text';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderText'][1] = 'Geben Sie hier den Text ein';
 
 $GLOBALS['TL_LANG']['tl_customslider']['sliderColor'][0] = 'Textfarbe';
-$GLOBALS['TL_LANG']['tl_customslider']['sliderColor'][1] = 'Textfarbe eingeben im HEX-Format ohne #';
+$GLOBALS['TL_LANG']['tl_customslider']['sliderColor'][1] = 'Textfarbe eingeben im HEX-Format ohne # (z.B. ff0000 für Rot)';
+
+$GLOBALS['TL_LANG']['tl_customslider']['colorInvalid'] = 'Bitte einen gültigen HEX-Farbwert eingeben (6 Zeichen ohne #, z.B. ff0000)';
 
 $GLOBALS['TL_LANG']['tl_customslider']['sliderLinkURL'][0] = 'Link URL';
 $GLOBALS['TL_LANG']['tl_customslider']['sliderLinkURL'][1] = 'Link URL (Externe Links inkl. http:// erfassen)';
