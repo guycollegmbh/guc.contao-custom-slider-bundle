@@ -6,6 +6,9 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ## [1.2.1] – 2026-06-25 — Security & Bugfix Release
 
+### Dokumentation
+- `README.md` vollständig neu geschrieben (war noch Contao-Skeleton-Vorlage): Voraussetzungen, Installation, Features, Einbindung, Update-Anleitung, Datenbankstruktur
+
 ### Security-Fixes
 - **XSS: `$imagePath` unescaped** — `FilesModel->path` wird jetzt mit `StringUtil::specialchars()` ausgegeben (war die einzige ungeschützte Ausgabe im Template).
 - **`sliderColor` Hex-Validierung** — Neuer `save_callback` `validateColor()` prüft ob der Wert dem Format `/^[0-9a-fA-F]{6}$/` entspricht. Verhindert CSS-Injection durch ungültige Werte im style-Attribut.
