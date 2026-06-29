@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'inputType' => 'select',
             'options'   => ['image', 'video'],
             'reference' => &$GLOBALS['TL_LANG']['tl_customslider']['mediaTypeOptions'],
-            'eval'      => array('submitOnChange' => true, 'tl_class' => 'w50'),
+            'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr'),
             'sql'       => "varchar(10) NOT NULL default 'image'"
         ),
         'sliderBild' => array
