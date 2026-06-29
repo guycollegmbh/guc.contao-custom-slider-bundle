@@ -13,7 +13,8 @@
         "contao/core-bundle": "^5.3"
     },
     "extra": {
-        "contao-manager-plugin": "GUYCOLLEGMBH\\ContaoCustomSliderBundle\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "GUYCOLLEGMBH\\ContaoCustomSliderBundle\\ContaoManager\\Plugin",
+        "logo": "Logo_guycolle.svg"
     },
     "autoload": {
         "psr-4": {
