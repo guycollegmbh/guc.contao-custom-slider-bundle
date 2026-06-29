@@ -4,6 +4,34 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.8] – 2026-06-29 — Style: Mute-Button Position
+
+### Anpassung
+- **Mute-Button `right: 19px`** — Abstand von der rechten Kante von 12px auf 19px angepasst (visuell besser bündig zur Orbit-Navigation).
+
+---
+
+## [1.2.7] – 2026-06-29 — Bugfix: Mute-Button unter orbit-next (Stacking-Context)
+
+### Bugfix
+- **`.orbit-next` lag nach Slide-Animation über dem Mute-Button** — Browser-Diagnostic (`document.elementFromPoint`) bestätigte, dass `.orbit-next` nach dem ersten Slide-Wechsel über dem Button lag. Ursache: Button war innerhalb der `li`-Stacking-Context, deren z-index von Foundation 5 als inline-Style gesetzt wird. Unser `z-index: 9999` am Button war relativ zu diesem Kontext, nicht global.
+- **Fix**: Button wird per PHP-Array (`$muteButtons[]`) während des `foreach` gesammelt und **nach `</ul>`** direkt im `.index_banner`-Div gerendert — als Geschwister des Foundation-`orbit-container`, nicht mehr darin. `.index_banner { position: relative }` dient als Positionierungskontext. Button startet mit `display: none` und wird per JS nur beim aktiven Video-Slide eingeblendet (`showMuteButton()` / `hideMuteButtons()`).
+- `data-player-id` auf `li[data-slide-type="video"]` ergänzt für die Zuordnung des aktiven Players im `onSlideActivated`-Handler.
+- `e.stopPropagation()` entfernt — nicht mehr nötig da Button ausserhalb des Orbits liegt.
+
+---
+
+## [1.2.6] – 2026-06-29 — Bugfix: Mute nach Slide-Wechsel (play()-Reihenfolge + Logo)
+
+### Bugfixes
+- **Mute-State nach Slide-Wechsel inkonsistent** — `applyMuteState()` wurde VOR `play()` aufgerufen. Vimeo setzt beim `play()` den muted-State auf den iframe-URL-Default (`muted=1`) zurück. Fix: `applyMuteState()` wird jetzt im `.then()`-Callback von `play()` aufgerufen.
+- **Mute-Button nicht klickbar nach Slide-Wechsel (erster Versuch)** — Button war in `overflow: hidden`-Container und mit inline `style="position:relative"` auf dem `li`. Foundation 5 überschreibt inline-Styles beim Animieren. Zwischenlösung: `li[data-slide-type="video"] { position: relative }` per CSS-Regel, Event-Delegation auf `document` (capture phase). Endgültig gelöst in v1.2.7.
+
+### Logo
+- **GUYCOLLE-Logo im Contao Manager** — `Logo_guycolle.svg` als base64 data-URI direkt in `extra.logo` in `composer.json` eingebettet. Selbst-tragend, kein Datei-Serving durch den Contao Manager nötig.
+
+---
+
 ## [1.2.5] – 2026-06-29 — Feature: Einheitliche Slide-Höhe (16:9)
 
 ### Verbesserung
