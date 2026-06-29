@@ -136,55 +136,36 @@ static $vimeoAssetsAdded = false;
 (function () {
     var players = {};
 
-    document.querySelectorAll('.slide-mute-btn').forEach(function (btn) {
-        var playerId = btn.getAttribute('data-player-id');
-        var iframe = document.getElementById(playerId);
-        if (!iframe) return;
+    function pauseOrbit(orbit) {
+        if (typeof jQuery === 'undefined') return;
+        var $o = jQuery(orbit);
+        // Foundation 5
+        var orb5 = $o.data('orbit-slider');
+        if (orb5 && orb5.stop_timer) { orb5.stop_timer(); return; }
+        // Foundation 6
+        var orb6 = $o.data('zf-orbit');
+        if (orb6 && orb6.timer && orb6.timer.pause) { orb6.timer.pause(); }
+    }
 
-        var player = new Vimeo.Player(iframe);
-        players[playerId] = { player: player, muted: true, iframe: iframe };
-
-        // Klick auf Container: Play / Pause
-        var container = iframe.closest('.slide-video-container');
-        container.addEventListener('click', function (e) {
-            if (e.target === btn || btn.contains(e.target)) return;
-            player.getPaused().then(function (paused) {
-                paused ? player.play() : player.pause();
-            });
-        });
-
-        // Mute-Button: Ton ein/aus — stopPropagation verhindert Slide-Wechsel
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            var state = players[playerId];
-            if (state.muted) {
-                player.setVolume(1);
-                state.muted = false;
-                btn.innerHTML = '&#x1F50A;';
-                btn.setAttribute('aria-label', 'Ton ausschalten');
-            } else {
-                player.setVolume(0);
-                state.muted = true;
-                btn.innerHTML = '&#x1F507;';
-                btn.setAttribute('aria-label', 'Ton einschalten');
-            }
-        });
-    });
+    function resumeOrbit(orbit) {
+        if (typeof jQuery === 'undefined') return;
+        var $o = jQuery(orbit);
+        // Foundation 5
+        var orb5 = $o.data('orbit-slider');
+        if (orb5 && orb5.start_timer) { orb5.start_timer(); return; }
+        // Foundation 6
+        var orb6 = $o.data('zf-orbit');
+        if (orb6 && orb6.timer && orb6.timer.resume) { orb6.timer.resume(); }
+    }
 
     function handleOrbitChange(orbit) {
         var activeLi = orbit.querySelector('li.is-active');
         var isVideoSlide = activeLi && activeLi.getAttribute('data-slide-type') === 'video';
 
-        // Orbit-Timer steuern: bei Video-Slide anhalten, sonst fortsetzen
-        if (typeof jQuery !== 'undefined') {
-            var orbitPlugin = jQuery(orbit).data('zf-orbit');
-            if (orbitPlugin && orbitPlugin.timer) {
-                if (isVideoSlide) {
-                    orbitPlugin.timer.pause();
-                } else {
-                    orbitPlugin.timer.resume();
-                }
-            }
+        if (isVideoSlide) {
+            pauseOrbit(orbit);
+        } else {
+            resumeOrbit(orbit);
         }
 
         // Vimeo-Player: inaktive pausieren, aktiven abspielen
@@ -197,15 +178,66 @@ static $vimeoAssetsAdded = false;
         });
     }
 
-    // Alle Orbit-Instanzen auf der Seite überwachen
-    document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
-        // Initialzustand prüfen: erster Slide könnte ein Video sein
-        handleOrbitChange(orbit);
+    function init() {
+        document.querySelectorAll('.slide-mute-btn').forEach(function (btn) {
+            var playerId = btn.getAttribute('data-player-id');
+            var iframe = document.getElementById(playerId);
+            if (!iframe) return;
 
-        orbit.addEventListener('changed.zf.orbit', function () {
-            handleOrbitChange(orbit);
+            var player = new Vimeo.Player(iframe);
+            players[playerId] = { player: player, muted: true, iframe: iframe };
+
+            // Klick auf Container: Play / Pause
+            var container = iframe.closest('.slide-video-container');
+            container.addEventListener('click', function (e) {
+                if (e.target === btn || btn.contains(e.target)) return;
+                player.getPaused().then(function (paused) {
+                    paused ? player.play() : player.pause();
+                });
+            });
+
+            // Mute-Button: Ton ein/aus — stopPropagation verhindert Slide-Wechsel
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var state = players[playerId];
+                if (state.muted) {
+                    // Unmute: zuerst muted-Flag aufheben, dann Lautstärke setzen
+                    player.setMuted(false).then(function () { player.setVolume(1); });
+                    state.muted = false;
+                    btn.innerHTML = '&#x1F50A;';
+                    btn.setAttribute('aria-label', 'Ton ausschalten');
+                } else {
+                    player.setMuted(true);
+                    state.muted = true;
+                    btn.innerHTML = '&#x1F507;';
+                    btn.setAttribute('aria-label', 'Ton einschalten');
+                }
+            });
         });
-    });
+
+        // Orbit-Instanzen überwachen — Foundation 5 und 6 Events
+        document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
+            // Foundation 6
+            orbit.addEventListener('changed.zf.orbit', function () {
+                handleOrbitChange(orbit);
+            });
+            // Foundation 5
+            if (typeof jQuery !== 'undefined') {
+                jQuery(orbit).on('orbit:after-slide-change', function () {
+                    handleOrbitChange(orbit);
+                });
+            }
+            // Initialzustand: nach Verzögerung prüfen damit Foundation fertig ist
+            setTimeout(function () { handleOrbitChange(orbit); }, 300);
+        });
+    }
+
+    // Sicherstellen dass DOM und Vimeo SDK bereit sind
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
 </script>
 <?php endif; ?>
