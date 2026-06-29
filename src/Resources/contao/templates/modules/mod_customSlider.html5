@@ -171,18 +171,39 @@ static $vimeoAssetsAdded = false;
         });
     });
 
-    // Alle Orbit-Instanzen: beim Slide-Wechsel inaktive Videos pausieren,
-    // aktiven Video-Slide abspielen
-    document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
-        orbit.addEventListener('changed.zf.orbit', function () {
-            var activeLi = orbit.querySelector('li.is-active');
-            Object.values(players).forEach(function (state) {
-                if (activeLi && activeLi.contains(state.iframe)) {
-                    state.player.play();
+    function handleOrbitChange(orbit) {
+        var activeLi = orbit.querySelector('li.is-active');
+        var isVideoSlide = activeLi && activeLi.getAttribute('data-slide-type') === 'video';
+
+        // Orbit-Timer steuern: bei Video-Slide anhalten, sonst fortsetzen
+        if (typeof jQuery !== 'undefined') {
+            var orbitPlugin = jQuery(orbit).data('zf-orbit');
+            if (orbitPlugin && orbitPlugin.timer) {
+                if (isVideoSlide) {
+                    orbitPlugin.timer.pause();
                 } else {
-                    state.player.pause();
+                    orbitPlugin.timer.resume();
                 }
-            });
+            }
+        }
+
+        // Vimeo-Player: inaktive pausieren, aktiven abspielen
+        Object.values(players).forEach(function (state) {
+            if (activeLi && activeLi.contains(state.iframe)) {
+                state.player.play();
+            } else {
+                state.player.pause();
+            }
+        });
+    }
+
+    // Alle Orbit-Instanzen auf der Seite überwachen
+    document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
+        // Initialzustand prüfen: erster Slide könnte ein Video sein
+        handleOrbitChange(orbit);
+
+        orbit.addEventListener('changed.zf.orbit', function () {
+            handleOrbitChange(orbit);
         });
     });
 })();
