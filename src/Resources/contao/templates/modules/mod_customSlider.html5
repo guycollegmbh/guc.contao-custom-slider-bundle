@@ -228,10 +228,12 @@ static $vimeoAssetsAdded = false;
 
         Object.values(players).forEach(function (state) {
             if (li.contains(state.iframe)) {
-                // Mute-State neu anwenden bevor play() — Tracking Prevention kann Player-State resetten
-                applyMuteState(state);
-                state.player.play();
-                updateMuteButton(state.iframe.id);
+                // Mute-State NACH play() setzen — Vimeo kann beim play() den muted-State
+                // auf den iframe-URL-Default (muted=1) zurücksetzen
+                state.player.play().then(function () {
+                    applyMuteState(state);
+                    updateMuteButton(state.iframe.id);
+                });
             } else {
                 state.player.pause();
             }
