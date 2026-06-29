@@ -32,7 +32,7 @@ static $vimeoAssetsAdded = false;
                             allowfullscreen
                             frameborder="0"
                         ></iframe>
-                        <button class="slide-mute-btn" data-player-id="<?= $playerId ?>" aria-label="Ton ein/ausschalten" title="Ton ein/ausschalten">
+                        <button class="slide-mute-btn" data-player-id="<?= $playerId ?>" aria-label="Ton einschalten" title="Ton einschalten">
                             &#x1F507;
                         </button>
                     </div>
@@ -105,6 +105,13 @@ static $vimeoAssetsAdded = false;
     height: 100%;
     pointer-events: none;
 }
+/* Orbit-Container: Höhe des aktiven Slides übernehmen */
+.example-orbit {
+    height: auto !important;
+}
+.example-orbit li {
+    height: auto !important;
+}
 .slide-mute-btn {
     position: absolute;
     bottom: 12px;
@@ -158,6 +165,26 @@ static $vimeoAssetsAdded = false;
         if (orb6 && orb6.timer && orb6.timer.resume) { orb6.timer.resume(); }
     }
 
+    // Mute-Button-Status eines Slides anhand des echten Vimeo-Zustands synchronisieren
+    function syncMuteButton(playerId) {
+        var state = players[playerId];
+        if (!state) return;
+        state.player.getMuted().then(function (muted) {
+            state.muted = muted;
+            var btn = document.querySelector('[data-player-id="' + playerId + '"]');
+            if (!btn) return;
+            if (muted) {
+                btn.innerHTML = '&#x1F507;';
+                btn.setAttribute('aria-label', 'Ton einschalten');
+                btn.setAttribute('title', 'Ton einschalten');
+            } else {
+                btn.innerHTML = '&#x1F50A;';
+                btn.setAttribute('aria-label', 'Ton ausschalten');
+                btn.setAttribute('title', 'Ton ausschalten');
+            }
+        });
+    }
+
     function handleOrbitChange(orbit) {
         var activeLi = orbit.querySelector('li.is-active');
         var isVideoSlide = activeLi && activeLi.getAttribute('data-slide-type') === 'video';
@@ -169,9 +196,13 @@ static $vimeoAssetsAdded = false;
         }
 
         // Vimeo-Player: inaktive pausieren, aktiven abspielen
+        // Beim Wechsel zurück auf einen Video-Slide: Button-Zustand synchronisieren
         Object.values(players).forEach(function (state) {
             if (activeLi && activeLi.contains(state.iframe)) {
                 state.player.play();
+                // Mute-Button-Status aus echtem Vimeo-Zustand lesen
+                var playerId = state.iframe.id;
+                syncMuteButton(playerId);
             } else {
                 state.player.pause();
             }
@@ -201,16 +232,17 @@ static $vimeoAssetsAdded = false;
                 e.stopPropagation();
                 var state = players[playerId];
                 if (state.muted) {
-                    // Unmute: zuerst muted-Flag aufheben, dann Lautstärke setzen
                     player.setMuted(false).then(function () { player.setVolume(1); });
                     state.muted = false;
                     btn.innerHTML = '&#x1F50A;';
                     btn.setAttribute('aria-label', 'Ton ausschalten');
+                    btn.setAttribute('title', 'Ton ausschalten');
                 } else {
                     player.setMuted(true);
                     state.muted = true;
                     btn.innerHTML = '&#x1F507;';
                     btn.setAttribute('aria-label', 'Ton einschalten');
+                    btn.setAttribute('title', 'Ton einschalten');
                 }
             });
         });
