@@ -8,6 +8,7 @@ use Contao\PageModel;
 
 $currentPageID = $GLOBALS['objPage']->id ?? null;
 $hasVideo = false;
+$muteButtons = []; // player IDs für Buttons ausserhalb des Orbits
 ?>
 
 <?php
@@ -23,8 +24,8 @@ static $vimeoAssetsAdded = false;
             <?php if (is_array($sliderPlazierung) && in_array($currentPageID, $sliderPlazierung, true)): ?>
                 <?php $mediaType = $slider['mediaType'] ?: 'image'; ?>
                 <?php $playerId = 'vimeo-' . (int)$this->id . '-' . (int)$index; ?>
-                <?php if ($mediaType === 'video' && $slider['sliderVimeoId']): $hasVideo = true; ?>
-                <li data-slide-type="video">
+                <?php if ($mediaType === 'video' && $slider['sliderVimeoId']): $hasVideo = true; $muteButtons[] = $playerId; ?>
+                <li data-slide-type="video" data-player-id="<?= $playerId ?>">
                     <div class="slide-video-container">
                         <iframe
                             id="<?= $playerId ?>"
@@ -34,9 +35,6 @@ static $vimeoAssetsAdded = false;
                             frameborder="0"
                         ></iframe>
                     </div>
-                    <button class="slide-mute-btn" data-player-id="<?= $playerId ?>" aria-label="Ton einschalten" title="Ton einschalten">
-                        &#x1F507;
-                    </button>
                 <?php else: ?>
                 <li data-slide-type="image">
                     <?php
@@ -89,12 +87,18 @@ static $vimeoAssetsAdded = false;
             <?php endif; ?>
         <?php endforeach; ?>
     </ul>
+
+    <?php foreach ($muteButtons as $pid): ?>
+    <button class="slide-mute-btn" data-player-id="<?= $pid ?>" aria-label="Ton einschalten" title="Ton einschalten">
+        &#x1F507;
+    </button>
+    <?php endforeach; ?>
 </div>
 
 <?php if (!$sliderCssAdded): $sliderCssAdded = true; ?>
 <style>
-/* Video-Slide li als Positionierungskontext (nicht inline — Foundation würde es überschreiben) */
-li[data-slide-type="video"] {
+/* .index_banner als Positionierungskontext für Mute-Button ausserhalb des Orbits */
+.index_banner {
     position: relative;
 }
 /* Alle Slides: einheitliches 16:9-Seitenverhältnis */
@@ -123,7 +127,9 @@ li[data-slide-type="video"] {
     height: 100%;
     pointer-events: none;
 }
+/* Mute-Button ausserhalb des Orbit-Containers — kein Stacking-Context-Problem mit orbit-next */
 .slide-mute-btn {
+    display: none;
     position: absolute;
     top: 12px;
     right: 12px;
@@ -137,7 +143,6 @@ li[data-slide-type="video"] {
     cursor: pointer;
     font-size: 16px;
     line-height: 1;
-    display: flex;
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
@@ -179,9 +184,7 @@ li[data-slide-type="video"] {
         if (orbitPaused) return;
         var plugin = findOrbitPlugin(orbit);
         if (!plugin) return;
-        // Foundation 5: stop_timer() pausiert den Timer
         if (typeof plugin.stop_timer === 'function') { plugin.stop_timer(); orbitPaused = true; return; }
-        // Foundation 6
         if (plugin.timer && typeof plugin.timer.pause === 'function') { plugin.timer.pause(); orbitPaused = true; }
     }
 
@@ -189,18 +192,14 @@ li[data-slide-type="video"] {
         if (!orbitPaused) return;
         var plugin = findOrbitPlugin(orbit);
         if (!plugin) return;
-        // Foundation 5: create_timer() erstellt und startet den Timer neu
         if (typeof plugin.create_timer === 'function') { plugin.create_timer(); orbitPaused = false; return; }
-        // Foundation 6
         if (plugin.timer && typeof plugin.timer.resume === 'function') { plugin.timer.resume(); orbitPaused = false; }
     }
 
-    // Aktualisiert den Mute-Button anhand des lokal gespeicherten state.muted
-    // Liest NICHT vom Player — vermeidet Probleme mit Browser-Tracking-Prevention
     function updateMuteButton(playerId) {
         var state = players[playerId];
         if (!state) return;
-        var btn = document.querySelector('[data-player-id="' + playerId + '"]');
+        var btn = document.querySelector('.slide-mute-btn[data-player-id="' + playerId + '"]');
         if (!btn) return;
         if (state.muted) {
             btn.innerHTML = '&#x1F507;';
@@ -213,7 +212,6 @@ li[data-slide-type="video"] {
         }
     }
 
-    // Wendet lokalen Mute-State auf den Player an
     function applyMuteState(state) {
         state.player.setMuted(state.muted);
         if (!state.muted) {
@@ -221,19 +219,35 @@ li[data-slide-type="video"] {
         }
     }
 
+    function showMuteButton(playerId) {
+        // Alle Mute-Buttons verstecken, dann den richtigen anzeigen
+        document.querySelectorAll('.slide-mute-btn').forEach(function (b) {
+            b.style.display = 'none';
+        });
+        var btn = document.querySelector('.slide-mute-btn[data-player-id="' + playerId + '"]');
+        if (btn) btn.style.display = 'flex';
+    }
+
+    function hideMuteButtons() {
+        document.querySelectorAll('.slide-mute-btn').forEach(function (b) {
+            b.style.display = 'none';
+        });
+    }
+
     function onSlideActivated(li, orbit) {
         var isVideoSlide = li.getAttribute('data-slide-type') === 'video';
 
         if (isVideoSlide) {
             pauseOrbit(orbit);
+            var activePlayerId = li.getAttribute('data-player-id');
+            if (activePlayerId) showMuteButton(activePlayerId);
         } else {
             resumeOrbit(orbit);
+            hideMuteButtons();
         }
 
         Object.values(players).forEach(function (state) {
             if (li.contains(state.iframe)) {
-                // Mute-State NACH play() setzen — Vimeo kann beim play() den muted-State
-                // auf den iframe-URL-Default (muted=1) zurücksetzen
                 state.player.play().then(function () {
                     applyMuteState(state);
                     updateMuteButton(state.iframe.id);
@@ -255,30 +269,21 @@ li[data-slide-type="video"] {
 
             // Klick auf Container: Play / Pause
             var container = iframe.closest('.slide-video-container');
-            container.addEventListener('click', function (e) {
+            container.addEventListener('click', function () {
                 player.getPaused().then(function (paused) {
                     paused ? player.play() : player.pause();
                 });
             });
+
+            // Mute-Button-Click (Button liegt ausserhalb des Orbits — kein stopPropagation nötig)
+            btn.addEventListener('click', function () {
+                var state = players[playerId];
+                state.muted = !state.muted;
+                applyMuteState(state);
+                updateMuteButton(playerId);
+            });
         });
 
-        // Mute-Button via Event-Delegation auf document (capture phase) — überlebt
-        // DOM-Manipulationen von Foundation 5 Orbit (Animation, Klonen, Style-Reset)
-        document.addEventListener('click', function (e) {
-            var btn = e.target.closest('.slide-mute-btn');
-            if (!btn) return;
-            e.stopPropagation();
-            e.preventDefault();
-            var playerId = btn.getAttribute('data-player-id');
-            var state = players[playerId];
-            if (!state) return;
-            state.muted = !state.muted;
-            applyMuteState(state);
-            updateMuteButton(playerId);
-        }, true);
-
-        // MutationObserver: erkennt Slide-Wechsel zuverlässig unabhängig von Foundation-Version
-        // Wird ausgelöst wenn Foundation die is-active Klasse auf einem li setzt
         document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
             var observer = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
@@ -295,7 +300,7 @@ li[data-slide-type="video"] {
             orbit.querySelectorAll('li').forEach(function (li) {
                 observer.observe(li, { attributes: true, attributeFilter: ['class'] });
             });
-            // Initialer Check: ist der erste aktive Slide ein Video?
+            // Initialer Check
             var firstActive = orbit.querySelector('li.active, li.is-active');
             if (firstActive) onSlideActivated(firstActive, orbit);
         });
