@@ -132,7 +132,7 @@ static $vimeoAssetsAdded = false;
     display: none;
     position: absolute;
     top: 12px;
-    right: 12px;
+    right: 19px;
     z-index: 9999;
     background: rgba(0, 0, 0, 0.55);
     border: none;
