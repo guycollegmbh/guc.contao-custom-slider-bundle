@@ -135,30 +135,28 @@ static $vimeoAssetsAdded = false;
 // jedem Vimeo-Update brechen. Risiko-Akzeptanz dokumentiert in CHANGELOG v1.2.1.
 (function () {
     var players = {};
+    var orbitPaused = false;
 
     function pauseOrbit(orbit) {
+        if (orbitPaused) return;
         if (typeof jQuery === 'undefined') return;
         var $o = jQuery(orbit);
-        // Foundation 5
         var orb5 = $o.data('orbit-slider');
-        if (orb5 && orb5.stop_timer) { orb5.stop_timer(); return; }
-        // Foundation 6
+        if (orb5 && orb5.stop_timer) { orb5.stop_timer(); orbitPaused = true; return; }
         var orb6 = $o.data('zf-orbit');
-        if (orb6 && orb6.timer && orb6.timer.pause) { orb6.timer.pause(); }
+        if (orb6 && orb6.timer && orb6.timer.pause) { orb6.timer.pause(); orbitPaused = true; }
     }
 
     function resumeOrbit(orbit) {
+        if (!orbitPaused) return;
         if (typeof jQuery === 'undefined') return;
         var $o = jQuery(orbit);
-        // Foundation 5
         var orb5 = $o.data('orbit-slider');
-        if (orb5 && orb5.start_timer) { orb5.start_timer(); return; }
-        // Foundation 6
+        if (orb5 && orb5.start_timer) { orb5.start_timer(); orbitPaused = false; return; }
         var orb6 = $o.data('zf-orbit');
-        if (orb6 && orb6.timer && orb6.timer.resume) { orb6.timer.resume(); }
+        if (orb6 && orb6.timer && orb6.timer.resume) { orb6.timer.resume(); orbitPaused = false; }
     }
 
-    // Mute-Button-Status eines Slides anhand des echten Vimeo-Zustands synchronisieren
     function syncMuteButton(playerId) {
         var state = players[playerId];
         if (!state) return;
@@ -178,9 +176,8 @@ static $vimeoAssetsAdded = false;
         });
     }
 
-    function handleOrbitChange(orbit) {
-        var activeLi = orbit.querySelector('li.is-active');
-        var isVideoSlide = activeLi && activeLi.getAttribute('data-slide-type') === 'video';
+    function onSlideActivated(li, orbit) {
+        var isVideoSlide = li.getAttribute('data-slide-type') === 'video';
 
         if (isVideoSlide) {
             pauseOrbit(orbit);
@@ -188,14 +185,10 @@ static $vimeoAssetsAdded = false;
             resumeOrbit(orbit);
         }
 
-        // Vimeo-Player: inaktive pausieren, aktiven abspielen
-        // Beim Wechsel zurück auf einen Video-Slide: Button-Zustand synchronisieren
         Object.values(players).forEach(function (state) {
-            if (activeLi && activeLi.contains(state.iframe)) {
+            if (li.contains(state.iframe)) {
                 state.player.play();
-                // Mute-Button-Status aus echtem Vimeo-Zustand lesen
-                var playerId = state.iframe.id;
-                syncMuteButton(playerId);
+                syncMuteButton(state.iframe.id);
             } else {
                 state.player.pause();
             }
@@ -220,7 +213,7 @@ static $vimeoAssetsAdded = false;
                 });
             });
 
-            // Mute-Button: Ton ein/aus — stopPropagation verhindert Slide-Wechsel
+            // Mute-Button: stopPropagation verhindert Slide-Wechsel beim Klick
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 var state = players[playerId];
@@ -240,24 +233,26 @@ static $vimeoAssetsAdded = false;
             });
         });
 
-        // Orbit-Instanzen überwachen — Foundation 5 und 6 Events
+        // MutationObserver: erkennt Slide-Wechsel zuverlässig unabhängig von Foundation-Version
+        // Wird ausgelöst wenn Foundation die is-active Klasse auf einem li setzt
         document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
-            // Foundation 6
-            orbit.addEventListener('changed.zf.orbit', function () {
-                handleOrbitChange(orbit);
-            });
-            // Foundation 5
-            if (typeof jQuery !== 'undefined') {
-                jQuery(orbit).on('orbit:after-slide-change', function () {
-                    handleOrbitChange(orbit);
+            var observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.attributeName === 'class') {
+                        var li = mutation.target;
+                        if (li.classList.contains('is-active')) {
+                            onSlideActivated(li, orbit);
+                        }
+                    }
                 });
-            }
-            // Initialzustand: nach Verzögerung prüfen damit Foundation fertig ist
-            setTimeout(function () { handleOrbitChange(orbit); }, 300);
+            });
+
+            orbit.querySelectorAll('li').forEach(function (li) {
+                observer.observe(li, { attributes: true, attributeFilter: ['class'] });
+            });
         });
     }
 
-    // Sicherstellen dass DOM und Vimeo SDK bereit sind
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
