@@ -153,8 +153,9 @@ static $vimeoAssetsAdded = false;
             });
         });
 
-        // Mute-Button: Ton ein/aus
-        btn.addEventListener('click', function () {
+        // Mute-Button: Ton ein/aus — stopPropagation verhindert Slide-Wechsel
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
             var state = players[playerId];
             if (state.muted) {
                 player.setVolume(1);
@@ -170,16 +171,17 @@ static $vimeoAssetsAdded = false;
         });
     });
 
-    // Alle Orbit-Instanzen auf der Seite: Video pausieren beim Slide-Wechsel,
-    // aber NICHT den Player des gerade aktivierten Slides
+    // Alle Orbit-Instanzen: beim Slide-Wechsel inaktive Videos pausieren,
+    // aktiven Video-Slide abspielen
     document.querySelectorAll('[data-orbit]').forEach(function (orbit) {
         orbit.addEventListener('changed.zf.orbit', function () {
             var activeLi = orbit.querySelector('li.is-active');
             Object.values(players).forEach(function (state) {
                 if (activeLi && activeLi.contains(state.iframe)) {
-                    return;
+                    state.player.play();
+                } else {
+                    state.player.pause();
                 }
-                state.player.pause();
             });
         });
     });
