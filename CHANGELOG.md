@@ -4,6 +4,20 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.4] – 2026-06-29 — Bugfix: Video pausiert beim Slide-Wechsel
+
+### Bugfixes
+- **Video pausiert nicht beim Slide-Wechsel** — MutationObserver lauschte auf `is-active` (Foundation 6), aber Foundation 5 Orbit setzt die Klasse `active` (ohne `is-`-Prefix). Der Observer feuerte deshalb nie. Fix: prüft jetzt `active` (F5) UND `is-active` (F6).
+- **Initialer Slide kein Video** — Erster aktiver Slide wird nach Observer-Setup geprüft, so dass Pause/Resume bei Seitenstart korrekt initialisiert wird.
+
+### Update-Schritte
+```bash
+composer update guycollegmbh/contao-custom-slider-bundle
+php vendor/bin/contao-console cache:clear
+```
+
+---
+
 ## [1.2.3] – 2026-06-29 — Bugfix: Mute/Unmute zuverlässig
 
 ### Bugfixes

@@ -256,7 +256,8 @@ static $vimeoAssetsAdded = false;
                 mutations.forEach(function (mutation) {
                     if (mutation.attributeName === 'class') {
                         var li = mutation.target;
-                        if (li.classList.contains('is-active')) {
+                        // Foundation 5 setzt 'active', Foundation 6 setzt 'is-active'
+                        if (li.classList.contains('active') || li.classList.contains('is-active')) {
                             onSlideActivated(li, orbit);
                         }
                     }
@@ -266,6 +267,9 @@ static $vimeoAssetsAdded = false;
             orbit.querySelectorAll('li').forEach(function (li) {
                 observer.observe(li, { attributes: true, attributeFilter: ['class'] });
             });
+            // Initialer Check: ist der erste aktive Slide ein Video?
+            var firstActive = orbit.querySelector('li.active, li.is-active');
+            if (firstActive) onSlideActivated(firstActive, orbit);
         });
     }
 
