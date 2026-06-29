@@ -4,6 +4,21 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.5] – 2026-06-29 — Feature: Einheitliche Slide-Höhe (16:9)
+
+### Verbesserung
+- **Einheitliches 16:9-Seitenverhältnis für alle Slides** — Bild-Slides wurden in einen `<div class="slide-image-container">` gewrapped. Beide Container (`.slide-image-container` und `.slide-video-container`) verwenden dieselbe `padding-bottom: 56.25%`-Technik für 16:9. Bilder werden mit `object-fit: cover; object-position: center` eingepasst — kein Leerraum mehr unter Bild-Slides wenn ein Video-Slide höher war.
+- **CSS immer ausgeben** — Slider-CSS (Bild + Video) wird über `static $sliderCssAdded` einmalig ausgegeben, unabhängig ob auf der Seite Video-Slides aktiv sind. Vimeo SDK und JS bleiben weiterhin im `$hasVideo`-Block.
+
+### Update-Schritte
+```bash
+composer update guycollegmbh/contao-custom-slider-bundle
+php vendor/bin/contao-console cache:clear
+```
+*(Kein `contao:migrate` nötig — keine DB-Änderungen)*
+
+---
+
 ## [1.2.4] – 2026-06-29 — Bugfix: Video pausiert beim Slide-Wechsel
 
 ### Bugfixes

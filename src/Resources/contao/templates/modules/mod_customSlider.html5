@@ -11,7 +11,8 @@ $hasVideo = false;
 ?>
 
 <?php
-// Style und Script werden nur einmal ausgegeben, auch wenn mehrere Slider-Module auf der Seite sind
+// CSS/Script werden nur einmal ausgegeben, auch wenn mehrere Slider-Module auf der Seite sind
+static $sliderCssAdded = false;
 static $vimeoAssetsAdded = false;
 ?>
 
@@ -42,9 +43,11 @@ static $vimeoAssetsAdded = false;
                     $fileModel = FilesModel::findByUuid($slider['sliderBild']);
                     $imagePath = $fileModel ? $fileModel->path : '';
                     ?>
-                    <?php if ($imagePath): ?>
-                        <img src="<?= StringUtil::specialchars($imagePath) ?>" alt="<?= StringUtil::specialchars($slider['sliderTitel'] ?: 'Slider Image') ?>">
-                    <?php endif; ?>
+                    <div class="slide-image-container">
+                        <?php if ($imagePath): ?>
+                            <img src="<?= StringUtil::specialchars($imagePath) ?>" alt="<?= StringUtil::specialchars($slider['sliderTitel'] ?: 'Slider Image') ?>">
+                        <?php endif; ?>
+                    </div>
                 <?php endif; ?>
 
                     <div class="orbit-caption">
@@ -88,14 +91,25 @@ static $vimeoAssetsAdded = false;
     </ul>
 </div>
 
-<?php if ($hasVideo && !$vimeoAssetsAdded): $vimeoAssetsAdded = true; ?>
+<?php if (!$sliderCssAdded): $sliderCssAdded = true; ?>
 <style>
+/* Alle Slides: einheitliches 16:9-Seitenverhältnis */
+.slide-image-container,
 .slide-video-container {
     position: relative;
     width: 100%;
     padding-bottom: 56.25%;
     overflow: hidden;
     background: #000;
+}
+.slide-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 .slide-video-container iframe {
     position: absolute;
@@ -128,6 +142,9 @@ static $vimeoAssetsAdded = false;
     background: rgba(0, 0, 0, 0.8);
 }
 </style>
+<?php endif; ?>
+
+<?php if ($hasVideo && !$vimeoAssetsAdded): $vimeoAssetsAdded = true; ?>
 <script src="https://player.vimeo.com/api/player.js"></script>
 <script>
 // Hinweis: player.vimeo.com/api/player.js wird ohne SRI-Hash geladen, da Vimeo
