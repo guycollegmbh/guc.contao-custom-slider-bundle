@@ -174,23 +174,30 @@ static $vimeoAssetsAdded = false;
         if (plugin.timer && typeof plugin.timer.resume === 'function') { plugin.timer.resume(); orbitPaused = false; }
     }
 
-    function syncMuteButton(playerId) {
+    // Aktualisiert den Mute-Button anhand des lokal gespeicherten state.muted
+    // Liest NICHT vom Player — vermeidet Probleme mit Browser-Tracking-Prevention
+    function updateMuteButton(playerId) {
         var state = players[playerId];
         if (!state) return;
-        state.player.getMuted().then(function (muted) {
-            state.muted = muted;
-            var btn = document.querySelector('[data-player-id="' + playerId + '"]');
-            if (!btn) return;
-            if (muted) {
-                btn.innerHTML = '&#x1F507;';
-                btn.setAttribute('aria-label', 'Ton einschalten');
-                btn.setAttribute('title', 'Ton einschalten');
-            } else {
-                btn.innerHTML = '&#x1F50A;';
-                btn.setAttribute('aria-label', 'Ton ausschalten');
-                btn.setAttribute('title', 'Ton ausschalten');
-            }
-        });
+        var btn = document.querySelector('[data-player-id="' + playerId + '"]');
+        if (!btn) return;
+        if (state.muted) {
+            btn.innerHTML = '&#x1F507;';
+            btn.setAttribute('aria-label', 'Ton einschalten');
+            btn.setAttribute('title', 'Ton einschalten');
+        } else {
+            btn.innerHTML = '&#x1F50A;';
+            btn.setAttribute('aria-label', 'Ton ausschalten');
+            btn.setAttribute('title', 'Ton ausschalten');
+        }
+    }
+
+    // Wendet lokalen Mute-State auf den Player an
+    function applyMuteState(state) {
+        state.player.setMuted(state.muted);
+        if (!state.muted) {
+            state.player.setVolume(1);
+        }
     }
 
     function onSlideActivated(li, orbit) {
@@ -204,8 +211,10 @@ static $vimeoAssetsAdded = false;
 
         Object.values(players).forEach(function (state) {
             if (li.contains(state.iframe)) {
+                // Mute-State neu anwenden bevor play() — Tracking Prevention kann Player-State resetten
+                applyMuteState(state);
                 state.player.play();
-                syncMuteButton(state.iframe.id);
+                updateMuteButton(state.iframe.id);
             } else {
                 state.player.pause();
             }
@@ -230,23 +239,13 @@ static $vimeoAssetsAdded = false;
                 });
             });
 
-            // Mute-Button: stopPropagation verhindert Slide-Wechsel beim Klick
+            // Mute-Button: lokalen State toggeln, auf Player anwenden, Button aktualisieren
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 var state = players[playerId];
-                if (state.muted) {
-                    player.setMuted(false).then(function () { player.setVolume(1); });
-                    state.muted = false;
-                    btn.innerHTML = '&#x1F50A;';
-                    btn.setAttribute('aria-label', 'Ton ausschalten');
-                    btn.setAttribute('title', 'Ton ausschalten');
-                } else {
-                    player.setMuted(true);
-                    state.muted = true;
-                    btn.innerHTML = '&#x1F507;';
-                    btn.setAttribute('aria-label', 'Ton einschalten');
-                    btn.setAttribute('title', 'Ton einschalten');
-                }
+                state.muted = !state.muted;
+                applyMuteState(state);
+                updateMuteButton(playerId);
             });
         });
 

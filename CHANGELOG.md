@@ -4,6 +4,23 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.3] – 2026-06-29 — Bugfix: Mute/Unmute zuverlässig
+
+### Bugfixes
+- **Mute/Unmute nach Slide-Wechsel defekt** — `getMuted()` liest den echten Player-State aus, welcher durch Browser-Tracking-Prevention (Safari/Firefox) blockiert oder zurückgesetzt werden kann. Fix: Mute-State wird jetzt **ausschliesslich lokal** in `state.muted` geführt, nie vom Player gelesen. Beim Zurückkehren zum Video-Slide wird der lokale State via `setMuted()` / `setVolume()` neu auf den Player angewendet.
+- `syncMuteButton()` (las von Player) ersetzt durch `updateMuteButton()` (liest von `state.muted`)
+- `applyMuteState()` als dedizierte Funktion zum Anwenden des lokalen States auf den Player
+- Mute-Button-Click vereinfacht: toggled `state.muted`, ruft `applyMuteState()` und `updateMuteButton()`
+
+### Update-Schritte
+```bash
+composer update guycollegmbh/contao-custom-slider-bundle
+php vendor/bin/contao-console cache:clear
+```
+*(Kein `contao:migrate` nötig — keine DB-Änderungen)*
+
+---
+
 ## [1.2.2] – 2026-06-29 — Bugfix: Orbit Pause/Resume
 
 ### Bugfixes
