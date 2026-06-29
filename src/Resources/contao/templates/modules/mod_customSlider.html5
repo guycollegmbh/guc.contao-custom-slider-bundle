@@ -141,8 +141,13 @@ static $vimeoAssetsAdded = false;
         if (orbitPaused) return;
         if (typeof jQuery === 'undefined') return;
         var $o = jQuery(orbit);
-        var orb5 = $o.data('orbit-slider');
+        // Foundation 5: Plugin unter data('orbit'), Methode stop_timer()
+        var orb5 = $o.data('orbit');
         if (orb5 && orb5.stop_timer) { orb5.stop_timer(); orbitPaused = true; return; }
+        // Foundation 5 alternativer Key
+        var orb5b = $o.data('orbit-slider');
+        if (orb5b && orb5b.stop_timer) { orb5b.stop_timer(); orbitPaused = true; return; }
+        // Foundation 6
         var orb6 = $o.data('zf-orbit');
         if (orb6 && orb6.timer && orb6.timer.pause) { orb6.timer.pause(); orbitPaused = true; }
     }
@@ -151,8 +156,12 @@ static $vimeoAssetsAdded = false;
         if (!orbitPaused) return;
         if (typeof jQuery === 'undefined') return;
         var $o = jQuery(orbit);
-        var orb5 = $o.data('orbit-slider');
-        if (orb5 && orb5.start_timer) { orb5.start_timer(); orbitPaused = false; return; }
+        // Foundation 5: restart_timer() startet den Timer neu
+        var orb5 = $o.data('orbit');
+        if (orb5 && orb5.restart_timer) { orb5.restart_timer(); orbitPaused = false; return; }
+        var orb5b = $o.data('orbit-slider');
+        if (orb5b && orb5b.restart_timer) { orb5b.restart_timer(); orbitPaused = false; return; }
+        // Foundation 6
         var orb6 = $o.data('zf-orbit');
         if (orb6 && orb6.timer && orb6.timer.resume) { orb6.timer.resume(); orbitPaused = false; }
     }
