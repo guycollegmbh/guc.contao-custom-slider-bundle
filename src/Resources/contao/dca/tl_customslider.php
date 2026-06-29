@@ -13,7 +13,6 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
     (
         'dataContainer'    => DC_Table::class,
         'enableVersioning' => true,
-        '__selector__'     => ['mediaType'],
         'sql'              => array
         (
             'keys' => array
@@ -76,14 +75,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => 'Bezeichnung,alias,mediaType,sliderTitel,sliderUntertitel,sliderText,sliderColor,sliderLinkURL,target,sliderLinkText,sliderLinkTitle,sliderPlazierung,sliderReihenfolge,active'
-    ),
-
-    // Subpalettes
-    'subpalettes' => array
-    (
-        'mediaType_image' => 'sliderBild',
-        'mediaType_video' => 'sliderVimeoId',
+        'default' => 'Bezeichnung,alias,mediaType,sliderBild,sliderVimeoId,sliderTitel,sliderUntertitel,sliderText,sliderColor,sliderLinkURL,target,sliderLinkText,sliderLinkTitle,sliderPlazierung,sliderReihenfolge,active'
     ),
 
     // Fields
@@ -144,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'label'     => &$GLOBALS['TL_LANG']['tl_customslider']['sliderBild'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => array('fieldType' => 'radio', 'filesOnly' => true, 'extensions' => \Contao\Config::get('validImageTypes')),
+            'eval'      => array('fieldType' => 'radio', 'filesOnly' => true, 'extensions' => \Contao\Config::get('validImageTypes'), 'tl_class' => 'clr'),
             'sql'       => "binary(16) NULL"
         ),
         'sliderVimeoId' => array
@@ -153,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'inputType' => 'text',
             'exclude'   => true,
             'search'    => true,
-            'eval'      => array('maxlength' => 20, 'rgxp' => 'digit', 'tl_class' => 'w50'),
+            'eval'      => array('maxlength' => 20, 'rgxp' => 'digit', 'tl_class' => 'w50 clr'),
             'sql'       => "varchar(20) NOT NULL default ''"
         ),
         'sliderTitel' => array
@@ -186,6 +178,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'sorting'   => true,
             'flag'      => 1,
             'search'    => true,
+            'eval'      => array('tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'sliderColor' => array
