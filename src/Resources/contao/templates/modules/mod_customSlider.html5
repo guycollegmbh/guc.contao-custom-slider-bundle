@@ -24,7 +24,7 @@ static $vimeoAssetsAdded = false;
                 <?php $mediaType = $slider['mediaType'] ?: 'image'; ?>
                 <?php $playerId = 'vimeo-' . (int)$this->id . '-' . (int)$index; ?>
                 <?php if ($mediaType === 'video' && $slider['sliderVimeoId']): $hasVideo = true; ?>
-                <li data-slide-type="video">
+                <li data-slide-type="video" style="position:relative;">
                     <div class="slide-video-container">
                         <iframe
                             id="<?= $playerId ?>"
@@ -33,10 +33,10 @@ static $vimeoAssetsAdded = false;
                             allowfullscreen
                             frameborder="0"
                         ></iframe>
-                        <button class="slide-mute-btn" data-player-id="<?= $playerId ?>" aria-label="Ton einschalten" title="Ton einschalten">
-                            &#x1F507;
-                        </button>
                     </div>
+                    <button class="slide-mute-btn" data-player-id="<?= $playerId ?>" aria-label="Ton einschalten" title="Ton einschalten">
+                        &#x1F507;
+                    </button>
                 <?php else: ?>
                 <li data-slide-type="image">
                     <?php
@@ -123,7 +123,7 @@ static $vimeoAssetsAdded = false;
     position: absolute;
     top: 12px;
     right: 12px;
-    z-index: 20;
+    z-index: 9999;
     background: rgba(0, 0, 0, 0.55);
     border: none;
     color: #fff;
