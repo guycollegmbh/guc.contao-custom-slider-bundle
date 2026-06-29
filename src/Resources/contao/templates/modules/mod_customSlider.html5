@@ -105,13 +105,6 @@ static $vimeoAssetsAdded = false;
     height: 100%;
     pointer-events: none;
 }
-/* Orbit-Container: Höhe des aktiven Slides übernehmen */
-.example-orbit {
-    height: auto !important;
-}
-.example-orbit li {
-    height: auto !important;
-}
 .slide-mute-btn {
     position: absolute;
     bottom: 12px;
