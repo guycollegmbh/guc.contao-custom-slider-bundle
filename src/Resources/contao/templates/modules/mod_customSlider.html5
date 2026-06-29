@@ -137,21 +137,19 @@ static $vimeoAssetsAdded = false;
     var players = {};
     var orbitPaused = false;
 
-    // Sucht das Foundation-Plugin-Objekt unabhängig vom Data-Key-Namen
     function findOrbitPlugin(orbit) {
         if (typeof jQuery === 'undefined') return null;
+        // Foundation 5 speichert das Plugin unter 'Instance' (gross I)
+        var inst = jQuery(orbit).data('Instance');
+        if (inst && typeof inst.stop_timer === 'function') return inst;
+        // Fallback: alle Data-Keys scannen
         var data = jQuery(orbit).data();
         if (!data) return null;
         var keys = Object.keys(data);
         for (var i = 0; i < keys.length; i++) {
             var val = data[keys[i]];
-            if (val && typeof val === 'object' && typeof val.stop_timer === 'function') {
-                return val;
-            }
-            // Foundation 6
-            if (val && typeof val === 'object' && val.timer && typeof val.timer.pause === 'function') {
-                return val;
-            }
+            if (val && typeof val === 'object' && typeof val.stop_timer === 'function') return val;
+            if (val && typeof val === 'object' && val.timer && typeof val.timer.pause === 'function') return val;
         }
         return null;
     }
@@ -160,7 +158,7 @@ static $vimeoAssetsAdded = false;
         if (orbitPaused) return;
         var plugin = findOrbitPlugin(orbit);
         if (!plugin) return;
-        // Foundation 5
+        // Foundation 5: stop_timer() pausiert den Timer
         if (typeof plugin.stop_timer === 'function') { plugin.stop_timer(); orbitPaused = true; return; }
         // Foundation 6
         if (plugin.timer && typeof plugin.timer.pause === 'function') { plugin.timer.pause(); orbitPaused = true; }
@@ -170,9 +168,8 @@ static $vimeoAssetsAdded = false;
         if (!orbitPaused) return;
         var plugin = findOrbitPlugin(orbit);
         if (!plugin) return;
-        // Foundation 5
-        if (typeof plugin.restart_timer === 'function') { plugin.restart_timer(); orbitPaused = false; return; }
-        if (typeof plugin.start_timer === 'function') { plugin.start_timer(); orbitPaused = false; return; }
+        // Foundation 5: create_timer() erstellt und startet den Timer neu
+        if (typeof plugin.create_timer === 'function') { plugin.create_timer(); orbitPaused = false; return; }
         // Foundation 6
         if (plugin.timer && typeof plugin.timer.resume === 'function') { plugin.timer.resume(); orbitPaused = false; }
     }

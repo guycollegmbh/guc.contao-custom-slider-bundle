@@ -4,6 +4,20 @@ Alle wesentlichen Änderungen am Bundle werden hier dokumentiert.
 
 ---
 
+## [1.2.2] – 2026-06-29 — Bugfix: Orbit Pause/Resume
+
+### Bugfixes
+- **Foundation 5 `resumeOrbit()` aufgerufen mit nicht-existenter Methode** — `restart_timer()` und `start_timer()` existieren nicht im Foundation 5 Orbit-Plugin. Konsolen-Diagnostic ergab: das Plugin ist unter `data('Instance')` (Grossbuchstabe I) gespeichert. Verfügbare Methoden: `create_timer, stop_timer, toggle_timer`. Fix: `findOrbitPlugin()` sucht jetzt direkt unter `data('Instance')` (mit Fallback: alle Keys scannen), `pauseOrbit()` ruft `stop_timer()`, `resumeOrbit()` ruft `create_timer()`.
+
+### Update-Schritte
+```bash
+composer update guycollegmbh/contao-custom-slider-bundle
+php vendor/bin/contao-console cache:clear
+```
+*(Kein `contao:migrate` nötig — keine DB-Änderungen)*
+
+---
+
 ## [1.2.1] – 2026-06-25 — Security & Bugfix Release
 
 ### Dokumentation
