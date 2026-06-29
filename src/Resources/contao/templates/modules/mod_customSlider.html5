@@ -24,7 +24,7 @@ static $vimeoAssetsAdded = false;
                 <?php $mediaType = $slider['mediaType'] ?: 'image'; ?>
                 <?php $playerId = 'vimeo-' . (int)$this->id . '-' . (int)$index; ?>
                 <?php if ($mediaType === 'video' && $slider['sliderVimeoId']): $hasVideo = true; ?>
-                <li data-slide-type="video" style="position:relative;">
+                <li data-slide-type="video">
                     <div class="slide-video-container">
                         <iframe
                             id="<?= $playerId ?>"
@@ -93,6 +93,10 @@ static $vimeoAssetsAdded = false;
 
 <?php if (!$sliderCssAdded): $sliderCssAdded = true; ?>
 <style>
+/* Video-Slide li als Positionierungskontext (nicht inline — Foundation würde es überschreiben) */
+li[data-slide-type="video"] {
+    position: relative;
+}
 /* Alle Slides: einheitliches 16:9-Seitenverhältnis */
 .slide-image-container,
 .slide-video-container {
@@ -252,21 +256,26 @@ static $vimeoAssetsAdded = false;
             // Klick auf Container: Play / Pause
             var container = iframe.closest('.slide-video-container');
             container.addEventListener('click', function (e) {
-                if (e.target === btn || btn.contains(e.target)) return;
                 player.getPaused().then(function (paused) {
                     paused ? player.play() : player.pause();
                 });
             });
-
-            // Mute-Button: lokalen State toggeln, auf Player anwenden, Button aktualisieren
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                var state = players[playerId];
-                state.muted = !state.muted;
-                applyMuteState(state);
-                updateMuteButton(playerId);
-            });
         });
+
+        // Mute-Button via Event-Delegation auf document (capture phase) — überlebt
+        // DOM-Manipulationen von Foundation 5 Orbit (Animation, Klonen, Style-Reset)
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.slide-mute-btn');
+            if (!btn) return;
+            e.stopPropagation();
+            e.preventDefault();
+            var playerId = btn.getAttribute('data-player-id');
+            var state = players[playerId];
+            if (!state) return;
+            state.muted = !state.muted;
+            applyMuteState(state);
+            updateMuteButton(playerId);
+        }, true);
 
         // MutationObserver: erkennt Slide-Wechsel zuverlässig unabhängig von Foundation-Version
         // Wird ausgelöst wenn Foundation die is-active Klasse auf einem li setzt
