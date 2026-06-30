@@ -217,6 +217,7 @@ $GLOBALS['TL_DCA']['tl_customslider'] = array
             'sorting'   => true,
             'flag'      => 1,
             'search'    => true,
+            'eval'      => array('tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'sliderLinkTitle' => array
